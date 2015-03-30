@@ -33,12 +33,12 @@ public class DatabaseFactory {
             if (ann.managerName().isEmpty()) {
                 EntityManager defaultEm = getDefaultEntityManager();
 
-                LOG.log(Level.INFO, "Generating new instance of JpaDao for entity [{0}] (default) ", ann.entityClass().getSimpleName());
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] (default) ", ann.entityClass().getSimpleName());
                 return new HibernateJpaDao(ann.entityClass(), defaultEm);
             } else {
                 EntityManager lookup = getEntityManager(ann.managerName());
 
-                LOG.log(Level.INFO, "Generating new instance of JpaDao for entity [{0}] ", ann.entityClass().getSimpleName());
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] ", ann.entityClass().getSimpleName());
                 return new HibernateJpaDao(ann.entityClass(), lookup);
             }
         }
@@ -62,7 +62,7 @@ public class DatabaseFactory {
                 }
             }
         } catch (NamingException ex) {
-            Logger.getLogger(DatabaseFactory.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
 
         throw new RuntimeException("No default @Manager specified");
@@ -86,8 +86,7 @@ public class DatabaseFactory {
 
             throw new RuntimeException("@Manager with name [" + managerName + "] not found");
         } catch (NamingException ex) {
-            Logger.getLogger(DatabaseFactory.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
-        return null;
     }
 }

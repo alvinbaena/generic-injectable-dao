@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.bquest.generic.injected.dao;
+package com.gammapeit.generic.injected.dao;
 
 /**
  *

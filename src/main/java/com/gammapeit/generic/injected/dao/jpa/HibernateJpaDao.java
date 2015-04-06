@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.bquest.generic.injected.dao.jpa;
+package com.gammapeit.generic.injected.dao.jpa;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -19,6 +19,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 /**
+ * Clase que tiene los metodos base (genericos) de un Dao {@linkplain Dao}, y
+ * añade los metodos de base de datos de jpa {@linkplain JpaDao}.
  *
  * @author bquest
  * @param <E> Tipo de la entidad
@@ -176,14 +178,18 @@ public class HibernateJpaDao<E extends Serializable, K> implements JpaDao<E, K> 
 
     @Override
     public <T> List<T> doWithNativeQuery(String query, Object[] params, Class<T> type) {
-        Query q = em.createNativeQuery(query, type);
+        if (query != null && !query.isEmpty() && type != null) {
+            Query q = em.createNativeQuery(query, type);
 
-        if (params != null && params.length > 0) {
-            for (int i = 0; i < params.length; i++) {
-                q.setParameter(i + 1, params[i]);
+            if (params != null && params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    q.setParameter(i + 1, params[i]);
+                }
             }
-        }
 
-        return q.getResultList();
+            return q.getResultList();
+        } else {
+            throw new IllegalArgumentException("Query o tipo nulos");
+        }
     }
 }

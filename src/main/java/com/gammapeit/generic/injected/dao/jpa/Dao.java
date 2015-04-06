@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.bquest.generic.injected.dao.jpa;
+package com.gammapeit.generic.injected.dao.jpa;
 
 import java.io.Serializable;
 import java.util.Collection;

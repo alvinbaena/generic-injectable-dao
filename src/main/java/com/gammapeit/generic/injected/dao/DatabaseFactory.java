@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.bquest.generic.injected.dao;
+package com.gammapeit.generic.injected.dao;
 
-import co.bquest.generic.injected.dao.jpa.HibernateJpaDao;
+import com.gammapeit.generic.injected.dao.jpa.HibernateJpaDao;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Stateless;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.naming.InitialContext;
@@ -20,7 +19,6 @@ import org.atteo.classindex.ClassIndex;
  *
  * @author bquest
  */
-@Stateless
 public class DatabaseFactory {
 
     private static final Logger LOG = Logger.getLogger(DatabaseFactory.class.getName());
@@ -53,6 +51,7 @@ public class DatabaseFactory {
                     Manager m = annotated.getAnnotation(Manager.class);
 
                     if (m.defaultManager()) {
+                        LOG.log(Level.FINE, "Looking up default @Manager [{0}]", m.lookup());
                         InitialContext ic = new InitialContext();
                         DaoDataSource dds = (DaoDataSource) ic.lookup(m.lookup());
                         return dds.getEntityManager();
@@ -75,6 +74,7 @@ public class DatabaseFactory {
                     Manager m = annotated.getAnnotation(Manager.class);
 
                     if (m.name().equals(managerName)) {
+                        LOG.log(Level.FINE, "Looking up [{0}] @Manager [{1}]", new Object[]{m.name(), m.lookup()});
                         InitialContext ic = new InitialContext();
                         DaoDataSource dds = (DaoDataSource) ic.lookup(m.lookup());
                         return dds.getEntityManager();

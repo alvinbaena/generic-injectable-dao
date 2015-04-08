@@ -2,6 +2,8 @@
 JPA Generic DAOs that are injectable using the pattern describen in the page http://blog.xebia.com/2009/03/09/jpa-implementation-patterns-data-access-objects/
 
 #Configuration
+This library will not work if the project is not inside a JEE container.
+
 To first use this library the component that has the persistence.xml file should have one EJB that extends DaoDataSource and is annotated with @Manager
 
 ```java

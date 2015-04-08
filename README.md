@@ -29,7 +29,7 @@ For example, having an entity of type 'Entity' and PK of type 'Integer' the resu
 ```java
 @Inject
 @GenericDao(Entity.class)
-private JpaDao<Entity, Integer> entityDao;
+private BaseJpaDao<Entity, Integer> entityDao;
 ```
 
 The daos have the most common methods needed, CRUD, Batch CRUD, Count, NamedQueries, NativeQueries, and Pagination.
@@ -39,7 +39,7 @@ The generic dao can also be used with more than one persistence unit:
 ```java
 @Inject
 @GenericDao(Entity.class, managerName = "manager")
-private JpaDao<Entity, Integer> entityDao;
+private BaseJpaDao<Entity, Integer> entityDao;
 ```
 
 When using the optional managerName tag the library will look for the Manager classes that have as a name the string supplied.

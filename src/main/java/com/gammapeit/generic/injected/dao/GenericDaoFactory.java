@@ -5,7 +5,10 @@
  */
 package com.gammapeit.generic.injected.dao;
 
-import com.gammapeit.generic.injected.dao.jpa.HibernateJpaDao;
+import com.gammapeit.generic.injected.dao.exception.GenericDaoException;
+import com.gammapeit.generic.injected.dao.exception.MissingAnnotationException;
+import com.gammapeit.generic.injected.dao.jpa.BaseJpaDao;
+import com.gammapeit.generic.injected.dao.jpa.JpaDao;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.inject.Produces;
@@ -19,29 +22,29 @@ import org.atteo.classindex.ClassIndex;
  *
  * @author bquest
  */
-public class DatabaseFactory {
+public class GenericDaoFactory {
 
-    private static final Logger LOG = Logger.getLogger(DatabaseFactory.class.getName());
+    private static final Logger LOG = Logger.getLogger(GenericDaoFactory.class.getName());
 
     @Produces
-    public HibernateJpaDao newInstance(InjectionPoint ip) {
-        if (ip.getAnnotated().isAnnotationPresent(Dao.class)) {
-            Dao ann = ip.getAnnotated().getAnnotation(Dao.class);
+    public BaseJpaDao newInstance(InjectionPoint ip) {
+        if (ip.getAnnotated().isAnnotationPresent(GenericDao.class)) {
+            GenericDao ann = ip.getAnnotated().getAnnotation(GenericDao.class);
 
             if (ann.managerName().isEmpty()) {
                 EntityManager defaultEm = getDefaultEntityManager();
 
-                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] (default) ", ann.entityClass().getSimpleName());
-                return new HibernateJpaDao(ann.entityClass(), defaultEm);
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with default manager", ann.entityClass().getSimpleName());
+                return new JpaDao(ann.entityClass(), defaultEm);
             } else {
                 EntityManager lookup = getEntityManager(ann.managerName());
 
-                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] ", ann.entityClass().getSimpleName());
-                return new HibernateJpaDao(ann.entityClass(), lookup);
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with non default manager [{1}]", new Object[]{ann.entityClass().getSimpleName(), ann.managerName()});
+                return new JpaDao(ann.entityClass(), lookup);
             }
         }
 
-        throw new IllegalStateException("Never should have happened");
+        throw new IllegalStateException("Cannot inject GenericDao class without @GenericDao annotation");
     }
 
     private EntityManager getDefaultEntityManager() {
@@ -57,11 +60,11 @@ public class DatabaseFactory {
                         return dds.getEntityManager();
                     }
                 } else {
-                    throw new NotImplementedException("Subclass of DaoDataSource.class does not have the @Manager annotation");
+                    throw new MissingAnnotationException("Subclass of DaoDataSource.class does not have the @Manager annotation");
                 }
             }
         } catch (NamingException ex) {
-            throw new RuntimeException(ex);
+            throw new GenericDaoException(ex);
         }
 
         throw new RuntimeException("No default @Manager specified");
@@ -80,13 +83,13 @@ public class DatabaseFactory {
                         return dds.getEntityManager();
                     }
                 } else {
-                    throw new NotImplementedException("Subclass of DaoDataSource.class does not have the @Manager annotation");
+                    throw new MissingAnnotationException("Subclass of DaoDataSource.class does not have the @Manager annotation");
                 }
             }
 
-            throw new RuntimeException("@Manager with name [" + managerName + "] not found");
+            throw new GenericDaoException("@Manager with name [" + managerName + "] not found");
         } catch (NamingException ex) {
-            throw new RuntimeException(ex);
+            throw new GenericDaoException(ex);
         }
     }
 }

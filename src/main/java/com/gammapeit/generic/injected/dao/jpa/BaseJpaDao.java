@@ -40,6 +40,15 @@ public abstract class BaseJpaDao<E extends Serializable, K> implements BaseDao<E
     public abstract List<E> findWithNamedQuery(String namedQuery, Map<String, Object> params);
 
     /**
+     * Busca una unica entidad usando un NamedQuery y parametros opcionales.
+     *
+     * @param namedQuery el nombre del NamedQuery.
+     * @param params un mapa con los parametros usados por el NamedQuery.
+     * @return La entidad encontrada, o null si no encuentra ninguna.
+     */
+    public abstract E findSingleWithNamedQuery(String namedQuery, Map<String, Object> params);
+
+    /**
      * Cuenta las entidades de una tabla usando un NamedQuery con el formato
      * {@literal SELECT COUNT...} y parametros opcionales.
      *
@@ -55,15 +64,24 @@ public abstract class BaseJpaDao<E extends Serializable, K> implements BaseDao<E
      * decir, consultas que no retornen toda la informacion de la entidad, sino
      * columnas especificas.
      *
+     * @param <T> el tipo generico que del objeto que se quiere recibir.
      * @param namedQuery el nombre del NamedQuery
      * @param limit limita el numero de resultados a mostrar de la consulta.
      * Debe ser siempre mayor que 0, si no se cumple se retorna la lista
      * completa.
      * @param params un mapa con los parametros usados por el NamedQuery
-     * @return una lista con los valores de las columnas retornadas por la
-     * consulta.
+     * @param type el tipo del objeto que se retorna. Si la consulta solamente
+     * una columna el tipo debe ser el equivalente en java
+     * {@literal (VARCHAR -> String, DECIMAL -> Double, etc)}, si se está
+     * consultando mas de una sola columna se debe obligatoriamente tener el
+     * tipo como {@literal Object[]}, si se esta consultando una entidad
+     * completa (cuando se usa una consulta del tipo
+     * {@literal SELECT * FROM...}) entonces el tipo ser la entidad que
+     * representa la tabla que se consulta.
+     * @return la lista con los resultados de la consulta, del tipo especificado
+     * en el parametro.
      */
-    public abstract List<Object> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params);
+    public abstract <T> List<T> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params, Class<T> type);
 
     /**
      * Hace una consulta usando el lenguaje SQL (puro) de la base de datos usada

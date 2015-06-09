@@ -148,6 +148,20 @@ public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
     }
 
     @Override
+    public E findSingleWithNamedQuery(String named, Map<String, Object> params) {
+        TypedQuery<E> q = em.createNamedQuery(named, entityClass);
+
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
+                q.setParameter(entrySet.getKey(), entrySet.getValue());
+            }
+        }
+
+        List<E> results = q.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    @Override
     public Long countWithNamedQuery(String named, Map<String, Object> params) {
         TypedQuery<Long> q = em.createNamedQuery(named, Long.class);
 
@@ -161,19 +175,19 @@ public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
     }
 
     @Override
-    public List<Object> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params) {
-        Query q = em.createNamedQuery(namedQuery);
+    public <T> List<T> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params, Class<T> type) {
+        if (namedQuery != null && !namedQuery.isEmpty() && type != null) {
+            Query q = em.createNamedQuery(namedQuery, type);
 
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                q.setParameter(entrySet.getKey(), entrySet.getValue());
+            if (params != null && !params.isEmpty()) {
+                for (Map.Entry<String, Object> entrySet : params.entrySet()) {
+                    q.setParameter(entrySet.getKey(), entrySet.getValue());
+                }
             }
-        }
-
-        if (limit > 0) {
-            return q.setMaxResults(limit).getResultList();
+            
+            return limit > 0 ? q.setMaxResults(limit).getResultList() : q.getResultList();
         } else {
-            return q.getResultList();
+            throw new IllegalArgumentException("Query o tipo nulos");
         }
     }
 

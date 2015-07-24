@@ -148,6 +148,19 @@ public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
     }
 
     @Override
+    public void executeWithNamedQuery(String named, Map<String, Object> params) {
+        Query q = em.createNamedQuery(named);
+        
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
+                q.setParameter(entrySet.getKey(), entrySet.getValue());
+            }
+        }
+        
+        q.executeUpdate();
+    }
+
+    @Override
     public E findSingleWithNamedQuery(String named, Map<String, Object> params) {
         TypedQuery<E> q = em.createNamedQuery(named, entityClass);
 
@@ -184,7 +197,7 @@ public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
                     q.setParameter(entrySet.getKey(), entrySet.getValue());
                 }
             }
-            
+
             return limit > 0 ? q.setMaxResults(limit).getResultList() : q.getResultList();
         } else {
             throw new IllegalArgumentException("Query o tipo nulos");
@@ -203,6 +216,23 @@ public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
             }
 
             return q.getResultList();
+        } else {
+            throw new IllegalArgumentException("Query o tipo nulos");
+        }
+    }
+
+    @Override
+    public void executeWithNativeQuery(String query, Object[] params) {
+        if (query != null && !query.isEmpty()) {
+            Query q = em.createNativeQuery(query);
+
+            if (params != null && params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    q.setParameter(i + 1, params[i]);
+                }
+            }
+
+            q.executeUpdate();
         } else {
             throw new IllegalArgumentException("Query o tipo nulos");
         }

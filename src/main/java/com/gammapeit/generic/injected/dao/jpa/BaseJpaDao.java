@@ -59,6 +59,14 @@ public abstract class BaseJpaDao<E extends Serializable, K> implements BaseDao<E
     public abstract Long countWithNamedQuery(String named, Map<String, Object> params);
 
     /**
+     * Realiza una actualizacion (executeUpdate) con un named query.
+     *
+     * @param named el nombre del namedQuery
+     * @param params un mapa con los parametros del query.
+     */
+    public abstract void executeWithNamedQuery(String named, Map<String, Object> params);
+
+    /**
      * Busca las columnas obtenidas con una consulta usando operaciones
      * agregadas ({@literal MAX, SUM, AVG, MIN, DISTINCT, COUNT, GROUP BY)}, es
      * decir, consultas que no retornen toda la informacion de la entidad, sino
@@ -110,6 +118,19 @@ public abstract class BaseJpaDao<E extends Serializable, K> implements BaseDao<E
      * son nulos.
      */
     public abstract <T> List<T> doWithNativeQuery(String query, Object[] params, Class<T> type);
+
+    /**
+     * Realiza una actualizacion (executeUpdate) con un named query.
+     *
+     * @param query el query nativo de sql.
+     * @param params los parametros de la sentencia, en el orden
+     * especifico en el que se encuentran en el SQL. Por ejemplo, si la consulta
+     * tiene tres parametros ?1, ?2, y ?3 en arreglo de parametros debe tener un
+     * tamaño de 3. En la primera posicion se encuentra el valor del parametro
+     * ?1, en la segunda posicion se encuentra el valor del parametro ?2, y asi
+     * sucesivamente.
+     */
+    public abstract void executeWithNativeQuery(String query, Object[] params);
 
     /**
      * Busca en la base de datos una lista de entidades usando parametros de

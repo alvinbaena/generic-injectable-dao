@@ -20,7 +20,7 @@ import org.atteo.classindex.ClassIndex;
 
 /**
  *
- * @author bquest
+ * @author alvinbaena
  */
 public class GenericDaoFactory {
 

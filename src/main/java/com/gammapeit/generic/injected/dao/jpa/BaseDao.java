@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Contrato para un data access object.
  *
- * @author bquest
+ * @author alvinbaena
  * @param <E> Tipo de entidad
  * @param <K> Tipo del primary key de la entidad.
  */

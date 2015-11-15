@@ -7,7 +7,7 @@ package com.gammapeit.generic.injected.dao.exception;
 
 /**
  *
- * @author bquest
+ * @author alvinbaena
  */
 public class IllegalConstructorException extends RuntimeException {
 

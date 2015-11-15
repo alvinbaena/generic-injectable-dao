@@ -14,7 +14,7 @@ import org.atteo.classindex.IndexSubclasses;
 /**
  * Contrato para un data access object que usa JPA.
  *
- * @author bquest
+ * @author alvinbaena
  * @param <E> el tipo de la entidad.
  * @param <K> la llave primaria de la entidad.
  */

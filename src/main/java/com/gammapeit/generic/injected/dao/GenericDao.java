@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * debe ser de tipo {@link JpaDao} para que esta anotacion funcione
  * correctamente.
  *
- * @author bquest
+ * @author alvinbaena
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

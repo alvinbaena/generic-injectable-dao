@@ -27,7 +27,7 @@ import javax.persistence.criteria.Root;
  * {@link GenericDao}, y añade los metodos de base de datos de jpa
  * {@link BaseJpaDao}.
  *
- * @author bquest
+ * @author alvinbaena
  * @param <E> Tipo de la entidad
  * @param <K> Tipo de la primary key de la entidad.
  */

@@ -8,12 +8,50 @@
     <packaging>jar</packaging>
 
     <name>Generic Injected Dao</name>
+    <description>JPA Generic DAOs that are injectable using the pattern described in the page http://blog.xebia.com/2009/03/09/jpa-implementation-patterns-data-access-objects/
+
+        This library will not work if the project is not inside a JEE container (JBoss, Glassfish, TomEE, etc).
+    </description>
+    <url>https://github.com/alvinbaena/generic-injectable-dao</url>
+    
+    <developers>
+        <developer>
+            <name>Alvin Baena</name>
+            <email>alvinbaena@gmail.com</email>
+            <organization>Gammapeit</organization>
+            <organizationUrl>http://www.gammapeit.com</organizationUrl>
+        </developer>
+    </developers>
+    
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
+    <scm>
+        <connection>scm:git:git://github.com/alvinbaena/generic-injectable-dao.git</connection>
+        <developerConnection>scm:git:git@github.com:alvinbaena/generic-injectable-dao.git</developerConnection>
+        <url>git@github.com:alvinbaena/generic-injectable-dao.git</url>
+    </scm>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -28,5 +66,76 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <configuration>
+                            <passphrase>${gpg.passphrase}</passphrase>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>true</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

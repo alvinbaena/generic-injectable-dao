@@ -11,7 +11,7 @@ import org.atteo.classindex.IndexSubclasses;
 /**
  * Interfaz que identifica un Session bean como dataSource para el GenericDao.
  *
- * @author bquest
+ * @author alvinbaena
  */
 @IndexSubclasses
 public interface DaoDataSource {

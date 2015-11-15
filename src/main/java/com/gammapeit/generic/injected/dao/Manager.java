@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 /**
  * Anotacion que identifica una clase como Manager.
  *
- * @author bquest
+ * @author alvinbaena
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

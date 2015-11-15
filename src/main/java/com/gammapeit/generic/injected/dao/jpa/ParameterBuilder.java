@@ -15,7 +15,7 @@ import java.util.Map;
  * La clase es un una envoltura soble un Map.
  * </p>
  *
- * @author bquest
+ * @author alvinbaena
  */
 public class ParameterBuilder {
 

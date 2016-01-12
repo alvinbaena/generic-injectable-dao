@@ -35,11 +35,17 @@ private BaseJpaDao<Entity, Integer> entityDao;
 There is a ParameterBuilder helper class that can be used instead of a Map<String, Object> (Probably useless, but whatever).
 
 ```java
-ParameterBuilder builder = new ParameterBuilder()
-                    .setParameter("param1", param1)
-                    .setParameter("param2", param2);
+ParameterBuilder builder = ParameterBuilder.with("param1", param1)
+                    .add("param2", param2);
             
 List<Entity> list = entityDao.findWithNamedQuery("Entity.namedQuery", builder.build());
+```
+
+Can also be used as
+```java
+import static com.gammapeit.generic.injected.dao.jpa.ParameterBuilder.*;
+
+List<Entity> list = entityDao.findWithNamedQuery("Entity.namedQuery", with("param1", param1).add("param2", param2).build());
 ```
 
 The DAOs have the most common methods needed, CRUD, Batch CRUD, Count, NamedQueries, NativeQueries, and Pagination (Currently Untested).
@@ -48,7 +54,7 @@ The generic DAO can also be used with more than one persistence unit:
 
 ```java
 @Inject
-@GenericDao(Entity.class, managerName = "manager")
+@GenericDao(value = Entity.class, managerName = "manager")
 private BaseJpaDao<Entity, Integer> entityDao;
 ```
 

@@ -34,13 +34,13 @@ public class GenericDaoFactory {
             if (ann.managerName().isEmpty()) {
                 EntityManager defaultEm = getDefaultEntityManager();
 
-                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with default manager", ann.entityClass().getSimpleName());
-                return new JpaDao(ann.entityClass(), defaultEm);
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with default manager", ann.value().getSimpleName());
+                return new JpaDao(ann.value(), defaultEm);
             } else {
                 EntityManager lookup = getEntityManager(ann.managerName());
 
-                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with non default manager [{1}]", new Object[]{ann.entityClass().getSimpleName(), ann.managerName()});
-                return new JpaDao(ann.entityClass(), lookup);
+                LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with non default manager [{1}]", new Object[]{ann.value().getSimpleName(), ann.managerName()});
+                return new JpaDao(ann.value(), lookup);
             }
         }
 

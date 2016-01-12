@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.FIELD})
 public @interface GenericDao {
 
     /**
@@ -30,7 +30,7 @@ public @interface GenericDao {
      *
      * @return la clase que identifica el tipo de la entidad.
      */
-    Class<? extends Serializable> entityClass();
+    Class<? extends Serializable> value();
 
     /**
      * (Opcional) El nombre del Session bean anotado con {@link Manager} y

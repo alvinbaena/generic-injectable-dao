@@ -20,9 +20,14 @@ import java.util.Map;
 public class ParameterBuilder {
 
     private Map<String, Object> params;
-
-    public ParameterBuilder() {
+    
+    private ParameterBuilder(String name, Object value){
         this.params = new HashMap<String, Object>();
+        this.params.put(name, value);
+    }
+    
+    public static ParameterBuilder with(String name, Object value){
+        return new ParameterBuilder(name, value);
     }
 
     /**
@@ -33,7 +38,7 @@ public class ParameterBuilder {
      * @param value el valor del parametro.
      * @return la instancia de esta clase.
      */
-    public ParameterBuilder setParameter(String name, Object value) {
+    public ParameterBuilder add(String name, Object value) {
         params.put(name, value);
         return this;
     }
@@ -45,7 +50,7 @@ public class ParameterBuilder {
      * @param name el nombre del parametro que se quiere eliminar.
      * @return la instancia de esta clase.
      */
-    public ParameterBuilder removeParameter(String name) {
+    public ParameterBuilder remove(String name) {
         params.remove(name);
         return this;
     }

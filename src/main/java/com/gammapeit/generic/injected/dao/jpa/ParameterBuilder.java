@@ -19,14 +19,34 @@ import java.util.Map;
  */
 public class ParameterBuilder {
 
-    private Map<String, Object> params;
-    
-    private ParameterBuilder(String name, Object value){
+    private final Map<String, Object> params;
+
+    private ParameterBuilder() {
+        this.params = new HashMap<String, Object>();
+    }
+
+    private ParameterBuilder(String name, Object value) {
         this.params = new HashMap<String, Object>();
         this.params.put(name, value);
     }
-    
-    public static ParameterBuilder with(String name, Object value){
+
+    /**
+     * Crea un ParameterBuilder vacio.
+     *
+     * @return esta instancia.
+     */
+    public static ParameterBuilder empty() {
+        return new ParameterBuilder();
+    }
+
+    /**
+     * Crea un ParameterBuilder con parametros iniciales.
+     *
+     * @param name el nombre del parametro en el NamedQuery
+     * @param value el valor del parametro.
+     * @return esta instancia.
+     */
+    public static ParameterBuilder with(String name, Object value) {
         return new ParameterBuilder(name, value);
     }
 

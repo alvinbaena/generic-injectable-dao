@@ -7,8 +7,8 @@ package com.gammapeit.generic.injected.dao;
 
 import com.gammapeit.generic.injected.dao.exception.GenericDaoException;
 import com.gammapeit.generic.injected.dao.exception.MissingAnnotationException;
-import com.gammapeit.generic.injected.dao.jpa.BaseJpaDao;
 import com.gammapeit.generic.injected.dao.jpa.JpaDao;
+import com.gammapeit.generic.injected.dao.jpa.JpaDaoImpl;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.inject.Produces;
@@ -27,7 +27,7 @@ public class GenericDaoFactory {
     private static final Logger LOG = Logger.getLogger(GenericDaoFactory.class.getName());
 
     @Produces
-    public BaseJpaDao newInstance(InjectionPoint ip) {
+    public JpaDao newInstance(InjectionPoint ip) {
         if (ip.getAnnotated().isAnnotationPresent(GenericDao.class)) {
             GenericDao ann = ip.getAnnotated().getAnnotation(GenericDao.class);
 
@@ -35,12 +35,12 @@ public class GenericDaoFactory {
                 EntityManager defaultEm = getDefaultEntityManager();
 
                 LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with default manager", ann.value().getSimpleName());
-                return new JpaDao(ann.value(), defaultEm);
+                return new JpaDaoImpl(ann.value(), defaultEm);
             } else {
                 EntityManager lookup = getEntityManager(ann.managerName());
 
                 LOG.log(Level.FINE, "Generating new instance of JpaDao for entity [{0}] with non default manager [{1}]", new Object[]{ann.value().getSimpleName(), ann.managerName()});
-                return new JpaDao(ann.value(), lookup);
+                return new JpaDaoImpl(ann.value(), lookup);
             }
         }
 

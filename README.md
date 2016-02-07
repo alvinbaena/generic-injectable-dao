@@ -29,7 +29,7 @@ For example, having an entity of type 'Entity' and PK of type 'Integer' the resu
 ```java
 @Inject
 @GenericDao(Entity.class)
-private BaseJpaDao<Entity, Integer> entityDao;
+private JpaDao<Entity, Integer> entityDao;
 ```
 
 There is a ParameterBuilder helper class that can be used instead of a Map<String, Object> (Probably useless, but whatever).
@@ -48,14 +48,14 @@ import static com.gammapeit.generic.injected.dao.jpa.ParameterBuilder.*;
 List<Entity> list = entityDao.findWithNamedQuery("Entity.namedQuery", with("param1", param1).add("param2", param2).build());
 ```
 
-The DAOs have the most common methods needed, CRUD, Batch CRUD, Count, NamedQueries, NativeQueries, and Pagination (Currently Untested).
+The DAOs have the most common methods needed, CRUD, Batch CRUD, Count, NamedQueries, NativeQueries, and Pagination (Filters, Sorts and uses hints).
 
 The generic DAO can also be used with more than one persistence unit:
 
 ```java
 @Inject
 @GenericDao(value = Entity.class, managerName = "manager")
-private BaseJpaDao<Entity, Integer> entityDao;
+private JpaDao<Entity, Integer> entityDao;
 ```
 
 When using the optional managerName tag the library will look for the @Manager classes that have a name (attribute of Manager annotation) that is the same as the string supplied.

@@ -12,4 +12,11 @@
                 <activatedProfile>release</activatedProfile>
             </activatedProfiles>
         </action>
+        <action>
+            <actionName>CUSTOM-Release Central</actionName>
+            <displayName>Release Central</displayName>
+            <goals>
+                <goal>nexus-staging:release</goal>
+            </goals>
+        </action>
     </actions>

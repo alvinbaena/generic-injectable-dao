@@ -5,287 +5,149 @@
  */
 package com.gammapeit.generic.injected.dao.jpa;
 
-import com.gammapeit.generic.injected.dao.GenericDao;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import org.atteo.classindex.IndexSubclasses;
 
 /**
- * Clase que tiene los metodos base (genericos) de un GenericDao
- * {@link GenericDao}, y añade los metodos de base de datos de jpa
- * {@link BaseJpaDao}.
+ * Contrato para un data access object que usa JPA.
  *
  * @author alvinbaena
- * @param <E> Tipo de la entidad
- * @param <K> Tipo de la primary key de la entidad.
+ * @param <E> el tipo de la entidad.
+ * @param <K> la llave primaria de la entidad.
  */
-public class JpaDao<E extends Serializable, K> extends BaseJpaDao<E, K> {
+@IndexSubclasses
+public abstract class JpaDao<E extends Serializable, K> implements BaseDao<E, K> {
 
-    private static final Logger log = Logger.getLogger(JpaDao.class.getName());
+    protected EntityManager em;
+    protected Class<E> entityClass;
 
     public JpaDao(Class<E> entityClass, EntityManager em) {
-        super(entityClass, em);
+        this.entityClass = entityClass;
+        this.em = em;
     }
 
-    @Override
-    public void create(E e) {
-        log.log(Level.FINE, "Creando entidad de tipo {0}", entityClass.getSimpleName());
-        em.persist(e);
-        em.flush();
-    }
+    /**
+     * Busca las entidades de una tabla usando un NamedQuery y parametros
+     * opcionales.
+     *
+     * @param namedQuery el nombre del NamedQuery.
+     * @param params un mapa con los parametros usados por el NamedQuery.
+     * @return la lista con las entidades encontradas.
+     */
+    public abstract List<E> findWithNamedQuery(String namedQuery, Map<String, Object> params);
 
-    @Override
-    public void update(E e) {
-        log.log(Level.FINE, "Actualizando entidad de tipo {0}", entityClass.getSimpleName());
-        em.merge(e);
-        em.flush();
-    }
+    /**
+     * Busca una unica entidad usando un NamedQuery y parametros opcionales.
+     *
+     * @param namedQuery el nombre del NamedQuery.
+     * @param params un mapa con los parametros usados por el NamedQuery.
+     * @return La entidad encontrada, o null si no encuentra ninguna.
+     */
+    public abstract E findSingleWithNamedQuery(String namedQuery, Map<String, Object> params);
 
-    @Override
-    public void delete(K id) {
-        log.log(Level.FINE, "Eliminando entidad de tipo {0}", entityClass.getSimpleName());
-        E delete = em.getReference(entityClass, id);
+    /**
+     * Cuenta las entidades de una tabla usando un NamedQuery con el formato
+     * {@literal SELECT COUNT...} y parametros opcionales.
+     *
+     * @param named el nombre del NamedQuery.
+     * @param params un mapa con los parametros usados por el NamedQuery.
+     * @return el conteo devuelto por el NamedQuery.
+     */
+    public abstract Long countWithNamedQuery(String named, Map<String, Object> params);
 
-        em.remove(delete);
-        em.flush();
-    }
+    /**
+     * Realiza una actualizacion (executeUpdate) con un named query.
+     *
+     * @param named el nombre del namedQuery
+     * @param params un mapa con los parametros del query.
+     */
+    public abstract void executeWithNamedQuery(String named, Map<String, Object> params);
 
-    @Override
-    public E find(K id) {
-        return em.find(entityClass, id);
-    }
+    /**
+     * Busca las columnas obtenidas con una consulta usando operaciones
+     * agregadas ({@literal MAX, SUM, AVG, MIN, DISTINCT, COUNT, GROUP BY)}, es
+     * decir, consultas que no retornen toda la informacion de la entidad, sino
+     * columnas especificas.
+     *
+     * @param <T> el tipo generico que del objeto que se quiere recibir.
+     * @param namedQuery el nombre del NamedQuery
+     * @param limit limita el numero de resultados a mostrar de la consulta.
+     * Debe ser siempre mayor que 0, si no se cumple se retorna la lista
+     * completa.
+     * @param params un mapa con los parametros usados por el NamedQuery
+     * @param type el tipo del objeto que se retorna. Si la consulta solamente
+     * una columna el tipo debe ser el equivalente en java
+     * {@literal (VARCHAR -> String, DECIMAL -> Double, etc)}, si se está
+     * consultando mas de una sola columna se debe obligatoriamente tener el
+     * tipo como {@literal Object[]}, si se esta consultando una entidad
+     * completa (cuando se usa una consulta del tipo
+     * {@literal SELECT * FROM...}) entonces el tipo ser la entidad que
+     * representa la tabla que se consulta.
+     * @return la lista con los resultados de la consulta, del tipo especificado
+     * en el parametro.
+     */
+    public abstract <T> List<T> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params, Class<T> type);
 
-    @Override
-    public void createBatch(Collection<E> e) {
-        log.log(Level.FINE, "Creando [{0}] entidades de tipo {1}", new Object[]{e.size(), entityClass.getSimpleName()});
+    /**
+     * Hace una consulta usando el lenguaje SQL (puro) de la base de datos usada
+     * por el sistema (Oracle, MySQL, etc). Las consultas realizadas no son
+     * independientes de la plataforma de base de datos.
+     *
+     * @param <T> el tipo generico del objeto que se retorna.
+     * @param query la consulta en SQL nativo.
+     * @param params los parametros de la consulta, en el orden especifico en el
+     * que se encuentran en el SQL. Por ejemplo, si la consulta tiene tres
+     * parametros ?1, ?2, y ?3 en arreglo de parametros debe tener un tamaño de
+     * 3. En la primera posicion se encuentra el valor del parametro ?1, en la
+     * segunda posicion se encuentra el valor del parametro ?2, y asi
+     * sucesivamente.
+     * @param type el tipo del objeto que se retorna. Si la consulta solamente
+     * una columna el tipo debe ser el equivalente en java
+     * {@literal (VARCHAR -> String, DECIMAL -> Double, etc)}, si se está
+     * consultando mas de una sola columna se debe obligatoriamente tener el
+     * tipo como {@literal Object[]}, si se esta consultando una entidad
+     * completa (cuando se usa una consulta del tipo
+     * {@literal SELECT * FROM...}) entonces el tipo ser la entidad que
+     * representa la tabla que se consulta.
+     * @return la lista con los resultados de la consulta, del tipo especificado
+     * en el parametro.
+     * @throws IllegalArgumentException si {@literal query} o {@literal type}
+     * son nulos.
+     */
+    public abstract <T> List<T> doWithNativeQuery(String query, Object[] params, Class<T> type);
 
-        int i = 0;
-        for (E ent : e) {
-            em.persist(ent);
+    /**
+     * Realiza una actualizacion (executeUpdate) con un named query.
+     *
+     * @param query el query nativo de sql.
+     * @param params los parametros de la sentencia, en el orden
+     * especifico en el que se encuentran en el SQL. Por ejemplo, si la consulta
+     * tiene tres parametros ?1, ?2, y ?3 en arreglo de parametros debe tener un
+     * tamaño de 3. En la primera posicion se encuentra el valor del parametro
+     * ?1, en la segunda posicion se encuentra el valor del parametro ?2, y asi
+     * sucesivamente.
+     */
+    public abstract void executeWithNativeQuery(String query, Object[] params);
 
-            if (i % 20 == 0) {
-                em.flush();
-            }
-        }
-        em.flush();
-
-        i++;
-    }
-
-    @Override
-    public void updateBatch(Collection<E> e) {
-        log.log(Level.FINE, "Actualizando [{0}] entidades de tipo {1}", new Object[]{e.size(), entityClass.getSimpleName()});
-
-        int i = 0;
-        for (E ent : e) {
-            em.merge(ent);
-
-            if (i % 20 == 0) {
-                em.flush();
-            }
-        }
-        em.flush();
-
-        i++;
-    }
-
-    @Override
-    public void deleteBatch(Collection<K> ids) {
-        log.log(Level.FINE, "Eliminando [{0}] entidades de tipo {1}", new Object[]{ids.size(), entityClass.getSimpleName()});
-
-        int i = 0;
-        for (K id : ids) {
-            E delete = em.getReference(entityClass, id);
-            em.remove(delete);
-
-            if (i % 20 == 0) {
-                em.flush();
-            }
-        }
-        em.flush();
-
-        i++;
-    }
-
-    @Override
-    public List<E> findAll() {
-        CriteriaQuery<E> cq = em.getCriteriaBuilder().createQuery(entityClass);
-        Root<E> root = cq.from(entityClass);
-        return em.createQuery(cq.select(root)).getResultList();
-    }
-
-    @Override
-    public Long countAll() {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-        cq.select(cb.count(cq.from(entityClass)));
-        return em.createQuery(cq).getSingleResult();
-    }
-
-    @Override
-    public List<E> findWithNamedQuery(String named, Map<String, Object> params) {
-        TypedQuery<E> q = em.createNamedQuery(named, entityClass);
-
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                q.setParameter(entrySet.getKey(), entrySet.getValue());
-            }
-        }
-
-        return q.getResultList();
-    }
-
-    @Override
-    public void executeWithNamedQuery(String named, Map<String, Object> params) {
-        Query q = em.createNamedQuery(named);
-        
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                q.setParameter(entrySet.getKey(), entrySet.getValue());
-            }
-        }
-        
-        q.executeUpdate();
-    }
-
-    @Override
-    public E findSingleWithNamedQuery(String named, Map<String, Object> params) {
-        TypedQuery<E> q = em.createNamedQuery(named, entityClass);
-
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                q.setParameter(entrySet.getKey(), entrySet.getValue());
-            }
-        }
-
-        List<E> results = q.getResultList();
-        return results.isEmpty() ? null : results.get(0);
-    }
-
-    @Override
-    public Long countWithNamedQuery(String named, Map<String, Object> params) {
-        TypedQuery<Long> q = em.createNamedQuery(named, Long.class);
-
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                q.setParameter(entrySet.getKey(), entrySet.getValue());
-            }
-        }
-
-        return q.getSingleResult();
-    }
-
-    @Override
-    public <T> List<T> findAggregateWithNamedQuery(String namedQuery, int limit, Map<String, Object> params, Class<T> type) {
-        if (namedQuery != null && !namedQuery.isEmpty() && type != null) {
-            Query q = em.createNamedQuery(namedQuery, type);
-
-            if (params != null && !params.isEmpty()) {
-                for (Map.Entry<String, Object> entrySet : params.entrySet()) {
-                    q.setParameter(entrySet.getKey(), entrySet.getValue());
-                }
-            }
-
-            return limit > 0 ? q.setMaxResults(limit).getResultList() : q.getResultList();
-        } else {
-            throw new IllegalArgumentException("Query o tipo nulos");
-        }
-    }
-
-    @Override
-    public <T> List<T> doWithNativeQuery(String query, Object[] params, Class<T> type) {
-        if (query != null && !query.isEmpty() && type != null) {
-            Query q = em.createNativeQuery(query, type);
-
-            if (params != null && params.length > 0) {
-                for (int i = 0; i < params.length; i++) {
-                    q.setParameter(i + 1, params[i]);
-                }
-            }
-
-            return q.getResultList();
-        } else {
-            throw new IllegalArgumentException("Query o tipo nulos");
-        }
-    }
-
-    @Override
-    public void executeWithNativeQuery(String query, Object[] params) {
-        if (query != null && !query.isEmpty()) {
-            Query q = em.createNativeQuery(query);
-
-            if (params != null && params.length > 0) {
-                for (int i = 0; i < params.length; i++) {
-                    q.setParameter(i + 1, params[i]);
-                }
-            }
-
-            q.executeUpdate();
-        } else {
-            throw new IllegalArgumentException("Query o tipo nulos");
-        }
-    }
-
-    @Override
-    public List<E> findLazy(int firstRow, int numRows, Map<String, Boolean> sort, Map<String, Object> filters, Map<String, String> hints) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<E> cq = cb.createQuery(entityClass);
-        Root<E> root = cq.from(entityClass);
-
-        if (sort != null && !sort.isEmpty()) {
-            List<Order> orders = new ArrayList<Order>();
-            for (Map.Entry<String, Boolean> sortField : sort.entrySet()) {
-                if (sortField.getValue()) {
-                    orders.add(cb.asc(root.get(sortField.getKey())));
-                } else {
-                    orders.add(cb.desc(root.get(sortField.getKey())));
-                }
-            }
-
-            cq.orderBy(orders);
-        }
-
-        Predicate f = cb.conjunction();
-        if (filters != null && !filters.isEmpty()) {
-            for (Map.Entry<String, Object> filter : filters.entrySet()) {
-                if (filter.getValue() instanceof String) {
-                    if (!filter.getValue().equals("")) {
-                        String valueString = (String) filter.getValue();
-                        f = cb.and(f, cb.like(cb.upper(root.<String>get(filter.getKey())), "%" + valueString.toUpperCase() + "%"));
-                    }
-                } else {
-                    //Seguramente no es string.
-                    f = cb.and(f, cb.equal(root.get(filter.getKey()), filter.getValue()));
-                }
-            }
-        }
-
-        cq.where(f);
-        TypedQuery<E> q = em.createQuery(cq);
-
-        if (firstRow > -1 && numRows > -1) {
-            q.setFirstResult(firstRow);
-            q.setMaxResults(numRows);
-        }
-
-        if (hints != null && !hints.isEmpty()) {
-            for (Map.Entry<String, String> hint : hints.entrySet()) {
-                q.setHint(hint.getKey(), hint.getValue());
-            }
-        }
-
-        return q.getResultList();
-    }
+    /**
+     * Busca en la base de datos una lista de entidades usando parametros de
+     * ordenamiento y filtrado. La busqueda se hace paginando por base de datos,
+     * es decir, se pueden obtener resultados en bloques.
+     *
+     * @param firstRow el indice del primer resultado a retornar.
+     * @param numRows numero de resultados a retornar, empezando desde firstRow.
+     * @param sort mapa de columnas (joins son validos, ej: columna.fk.col_fk)
+     * con sus repsectivos ordenes (true = asc, false = desc).
+     * @param filters mapa de los filtros a usar. El filtrado se hace agregando
+     * los filtros a un conjunto de predicados unidos por sentencias AND (OR no
+     * disponible)
+     * @param hints mapa con las propiedades dependientes del provedor de
+     * persistencia que se quieren usar en la consulta.
+     * @return Una lista con las entidades filtradas y ordenadas que fueron
+     * encontradas.
+     */
+    public abstract List<E> findLazy(int firstRow, int numRows, Map<String, Boolean> sort, Map<String, Object> filters, Map<String, String> hints);
 }

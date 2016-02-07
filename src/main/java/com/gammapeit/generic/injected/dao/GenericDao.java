@@ -5,7 +5,7 @@
  */
 package com.gammapeit.generic.injected.dao;
 
-import com.gammapeit.generic.injected.dao.jpa.JpaDao;
+import com.gammapeit.generic.injected.dao.jpa.JpaDaoImpl;
 import java.io.Serializable;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 
 /**
  * Clase que identifica a una variable de instancia como un dao. Esta variable
- * debe ser de tipo {@link JpaDao} para que esta anotacion funcione
+ * debe ser de tipo {@link JpaDaoImpl} para que esta anotacion funcione
  * correctamente.
  *
  * @author alvinbaena

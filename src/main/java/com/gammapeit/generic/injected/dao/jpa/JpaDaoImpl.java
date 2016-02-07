@@ -251,10 +251,10 @@ public class JpaDaoImpl<E extends Serializable, K> extends JpaDao<E, K> {
             for (Map.Entry<String, Boolean> sortField : sort.entrySet()) {
 
                 Path pathExpression;
-                
+
                 if (sortField.getKey().contains(".")) {
                     String[] path = sortField.getKey().split("\\.");
-                    
+
                     pathExpression = root.get(path[0]);
                     for (int i = 1; i < path.length; i++) {
                         pathExpression = pathExpression.get(path[i]);
@@ -262,8 +262,7 @@ public class JpaDaoImpl<E extends Serializable, K> extends JpaDao<E, K> {
                 } else {
                     pathExpression = root.get(sortField.getKey());
                 }
-                
-                
+
                 if (sortField.getValue()) {
                     orders.add(cb.asc(pathExpression));
                 } else {
@@ -277,27 +276,27 @@ public class JpaDaoImpl<E extends Serializable, K> extends JpaDao<E, K> {
         Predicate f = cb.conjunction();
         if (filters != null && !filters.isEmpty()) {
             for (Map.Entry<String, Object> filter : filters.entrySet()) {
+                Path pathExpression;
+                if (filter.getKey().contains(".")) {
+                    String[] path = filter.getKey().split("\\.");
+
+                    pathExpression = root.get(path[0]);
+                    for (int i = 1; i < path.length; i++) {
+                        pathExpression = pathExpression.get(path[i]);
+                    }
+                } else {
+                    pathExpression = root.get(filter.getKey());
+                }
+
                 if (filter.getValue() instanceof String) {
                     if (filter.getValue() != null && !filter.getValue().equals("")) {
                         String valueString = (String) filter.getValue();
-                        
-                        Path<String> pathExpression;
-                        if (filter.getKey().contains(".")) {
-                            String[] path = filter.getKey().split("\\.");
-                            
-                            pathExpression = root.get(path[0]);
-                            for (int i = 1; i < path.length; i++) {
-                                pathExpression = pathExpression.get(path[i]);
-                            }
-                        } else {
-                            pathExpression = root.get(filter.getKey());
-                        }
-                        
+
                         f = cb.and(f, cb.equal(cb.upper((Expression<String>) pathExpression), valueString.toUpperCase()));
                     }
                 } else {
                     //Seguramente no es string.
-                    f = cb.and(f, cb.equal(root.get(filter.getKey()), filter.getValue()));
+                    f = cb.and(f, cb.equal(pathExpression, filter.getValue()));
                 }
             }
         }

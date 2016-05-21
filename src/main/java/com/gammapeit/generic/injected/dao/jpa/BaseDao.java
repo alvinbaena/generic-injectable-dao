@@ -5,7 +5,7 @@
  */
 package com.gammapeit.generic.injected.dao.jpa;
 
-import java.io.Serializable;
+import com.gammapeit.generic.injected.dao.InjectableEntity;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * @param <E> Tipo de entidad
  * @param <K> Tipo del primary key de la entidad.
  */
-public interface BaseDao<E extends Serializable, K> {
+public interface BaseDao<E extends InjectableEntity, K> {
 
     /**
      * Inserta un nuevo campo en la base de datos.

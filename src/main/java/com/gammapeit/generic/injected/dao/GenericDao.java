@@ -30,7 +30,7 @@ public @interface GenericDao {
      *
      * @return la clase que identifica el tipo de la entidad.
      */
-    Class<? extends Serializable> value();
+    Class<? extends InjectableEntity> value();
 
     /**
      * (Opcional) El nombre del Session bean anotado con {@link Manager} y

@@ -27,7 +27,7 @@ public class GenericDaoFactory {
     private static final Logger LOG = Logger.getLogger(GenericDaoFactory.class.getName());
 
     @Produces
-    public JpaDao newInstance(InjectionPoint ip) {
+    public <E extends InjectableEntity, K> JpaDao<E, K> newInstance(InjectionPoint ip) {
         if (ip.getAnnotated().isAnnotationPresent(GenericDao.class)) {
             GenericDao ann = ip.getAnnotated().getAnnotation(GenericDao.class);
 

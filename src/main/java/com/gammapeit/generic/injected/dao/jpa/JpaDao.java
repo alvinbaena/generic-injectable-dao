@@ -5,7 +5,7 @@
  */
 package com.gammapeit.generic.injected.dao.jpa;
 
-import java.io.Serializable;
+import com.gammapeit.generic.injected.dao.InjectableEntity;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -19,7 +19,7 @@ import org.atteo.classindex.IndexSubclasses;
  * @param <K> la llave primaria de la entidad.
  */
 @IndexSubclasses
-public abstract class JpaDao<E extends Serializable, K> implements BaseDao<E, K> {
+public abstract class JpaDao<E extends InjectableEntity, K> implements BaseDao<E, K> {
 
     protected EntityManager em;
     protected Class<E> entityClass;

@@ -6,7 +6,7 @@
 package com.gammapeit.generic.injected.dao.jpa;
 
 import com.gammapeit.generic.injected.dao.GenericDao;
-import java.io.Serializable;
+import com.gammapeit.generic.injected.dao.InjectableEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +33,7 @@ import javax.persistence.criteria.Root;
  * @param <E> Tipo de la entidad
  * @param <K> Tipo de la primary key de la entidad.
  */
-public class JpaDaoImpl<E extends Serializable, K> extends JpaDao<E, K> {
+public class JpaDaoImpl<E extends InjectableEntity, K> extends JpaDao<E, K> {
 
     private static final Logger log = Logger.getLogger(JpaDaoImpl.class.getName());
 
